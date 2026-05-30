@@ -1,0 +1,12 @@
+base_currency: USD
+rates:
+  - from_currency: EUR
+    to_currency: USD
+    rate: 1.09
+    source: manual-example
+    observed_at: "2026-05-30T00:00:00+00:00"
+  - from_currency: GBP
+    to_currency: USD
+    rate: 1.27
+    source: manual-example
+    observed_at: "2026-05-30T00:00:00+00:00"

@@ -1,0 +1,88 @@
+trips:
+  - destination: Berlin
+    country: Germany
+    started_on: "2024-09-12"
+    ended_on: "2024-09-16"
+    rating: 4.6
+    music_rating: 4.8
+    food_rating: 4.0
+    lodging_rating: 4.2
+    transport_rating: 4.4
+    pace_rating: 4.1
+    would_repeat: true
+    tags:
+      - electronic
+      - walkable
+      - late-night
+      - museums
+    liked:
+      - Strong venue density
+      - Good public transport
+      - Easy long weekend pacing
+    disliked:
+      - Late return made Monday rough
+    notes: Great fit for music, but should not become the default answer.
+  - destination: Berlin
+    country: Germany
+    started_on: "2025-11-07"
+    ended_on: "2025-11-10"
+    rating: 4.2
+    music_rating: 4.5
+    food_rating: 3.8
+    lodging_rating: 3.7
+    transport_rating: 4.0
+    pace_rating: 3.8
+    would_repeat: true
+    tags:
+      - electronic
+      - repeat
+      - easy-flight
+    liked:
+      - Strong club calendar
+      - Good direct flight options
+    disliked:
+      - Repeated destination felt less novel
+    notes: Still good, but diversity should get extra weight next time.
+  - destination: Amsterdam
+    country: Netherlands
+    started_on: "2025-05-02"
+    ended_on: "2025-05-06"
+    rating: 4.4
+    music_rating: 4.0
+    food_rating: 4.1
+    lodging_rating: 3.9
+    transport_rating: 4.7
+    pace_rating: 4.4
+    would_repeat: true
+    tags:
+      - rail-friendly
+      - walkable
+      - galleries
+      - good-food
+    liked:
+      - Rail and local transport were easy
+      - Good balance of city wandering and events
+    disliked:
+      - Lodging was expensive for the room quality
+    notes: Good pattern for train-first breaks with strong daytime options.
+  - destination: Barcelona
+    country: Spain
+    started_on: "2023-06-15"
+    ended_on: "2023-06-20"
+    rating: 3.6
+    music_rating: 3.4
+    food_rating: 4.6
+    lodging_rating: 3.3
+    transport_rating: 3.7
+    pace_rating: 3.1
+    would_repeat: false
+    tags:
+      - hot-weather
+      - food
+      - crowded
+    liked:
+      - Excellent food
+      - Strong architecture days
+    disliked:
+      - Heat and crowding made the pace worse
+    notes: Better in shoulder season if reconsidered.

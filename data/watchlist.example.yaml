@@ -1,0 +1,54 @@
+profile:
+  home_city: Cheltenham
+  preferred_airports:
+    - BRS
+    - BHX
+    - LHR
+    - LGW
+  preferred_stations:
+    - Cheltenham Spa
+    - Bristol Temple Meads
+    - Birmingham New Street
+  default_currency: USD
+  max_trip_budget: 1200
+  pace: "music-first, low chaos"
+
+music:
+  priority_artists: []
+  genres:
+    - indie
+    - electronic
+    - post-punk
+  discovery_notes: "Use Spotify favorites later; for now, update manually from chat."
+
+watched_trips:
+  - name: "Berlin long weekend"
+    destination: Berlin
+    earliest_start: "2026-07-01"
+    latest_end: "2026-09-30"
+    nights_min: 3
+    nights_max: 5
+    budget_limit: 900
+    watch:
+      flights: true
+      trains: false
+      concerts: true
+    notes: "Good for electronic music and museums."
+
+  - name: "Amsterdam by rail"
+    destination: Amsterdam
+    earliest_start: "2026-07-01"
+    latest_end: "2026-09-30"
+    nights_min: 2
+    nights_max: 4
+    budget_limit: 800
+    watch:
+      flights: false
+      trains: true
+      concerts: true
+    notes: "Prefer Eurostar if timing and price are not stupid."
+
+alerts:
+  price_drop_threshold_percent: 15
+  max_total_travel_time_hours: 8
+  require_calendar_fit: true

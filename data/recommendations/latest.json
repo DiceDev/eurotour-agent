@@ -1,0 +1,51 @@
+[
+  {
+    "trip_name": "Berlin long weekend",
+    "destination": "Berlin",
+    "decision": "book",
+    "title": "Book Berlin",
+    "summary": "Berlin from 2026-07-01 to 2026-07-04: 1 transport option(s), 1 event option(s), score 0.850.",
+    "score": 0.85,
+    "estimated_total_amount": 233.0,
+    "estimated_total_currency": "USD",
+    "reasons": [
+      "Composite score is 0.850.",
+      "Best event signal is Example Electronic Act in Berlin with relevance 0.82.",
+      "Lowest tracked flight option is 185.00 USD.",
+      "Estimated tracked cost is 233.00 against budget 900.00."
+    ],
+    "risks": [
+      "Manual findings need primary-source re-check before money changes hands."
+    ],
+    "next_actions": [
+      "Verify calendar availability.",
+      "Confirm fare and ticket availability on primary sources.",
+      "Prepare booking checklist; do not purchase automatically."
+    ]
+  },
+  {
+    "trip_name": "Amsterdam by rail",
+    "destination": "Amsterdam",
+    "decision": "watch",
+    "title": "Watch Amsterdam",
+    "summary": "Amsterdam from 2026-07-01 to 2026-07-03: 1 transport option(s), 1 event option(s), score 0.723.",
+    "score": 0.723,
+    "estimated_total_amount": 242.78,
+    "estimated_total_currency": "USD",
+    "reasons": [
+      "Composite score is 0.723.",
+      "Best event signal is Priority artist TBD in Amsterdam with relevance 0.55.",
+      "Lowest tracked train option is 177.78 USD.",
+      "Estimated tracked cost is 242.78 against budget 800.00."
+    ],
+    "risks": [
+      "Transport prices are fixture estimates, not live fares.",
+      "Concert data is fixture output, not live inventory."
+    ],
+    "next_actions": [
+      "Refresh transport prices from primary or aggregator sources.",
+      "Refresh concert discovery from Spotify, Bandsintown, Songkick, DICE, RA, and venue calendars.",
+      "Re-rank after calendar fit is confirmed."
+    ]
+  }
+]

@@ -1,0 +1,36 @@
+generated_at: "2026-05-30T00:00:00+00:00"
+source: sample
+artists:
+  - name: "Kevin Morby"
+    source: sample
+    genres:
+      - indie folk
+      - alternative
+    popularity: 55
+    weight: 0.92
+  - name: "The Cure"
+    source: sample
+    genres:
+      - post-punk
+      - new wave
+    popularity: 78
+    weight: 0.9
+  - name: "ARTBAT"
+    source: sample
+    genres:
+      - melodic techno
+      - electronic
+    popularity: 62
+    weight: 0.82
+  - name: "Boys Noize"
+    source: sample
+    genres:
+      - electro
+      - electronic
+    popularity: 58
+    weight: 0.76
+genres:
+  - electronic
+  - post-punk
+  - indie folk
+  - melodic techno

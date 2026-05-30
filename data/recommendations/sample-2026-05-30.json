@@ -1,0 +1,147 @@
+[
+  {
+    "trip_name": "Berlin long weekend",
+    "destination": "Berlin",
+    "decision": "book",
+    "title": "Book Berlin",
+    "summary": "Berlin from 2026-07-03 to 2026-07-06: 2 transport option(s), 2 event option(s), score 0.842.",
+    "score": 0.842,
+    "estimated_total_amount": 855.0,
+    "estimated_total_currency": "USD",
+    "estimate_complete": false,
+    "missing_cost_categories": [
+      "transport",
+      "event"
+    ],
+    "cost_breakdown": [
+      {
+        "category": "accommodation",
+        "label": "Berlin mid-range hotel estimate",
+        "source": "manual",
+        "amount": 450.0,
+        "currency": "USD",
+        "confidence": 0.45,
+        "notes": "Placeholder for a sane private room/hotel search; verify on Booking/Hotels/Google Hotels."
+      },
+      {
+        "category": "local_transit",
+        "label": "Berlin airport transfers and BVG transit",
+        "source": "manual",
+        "amount": 45.0,
+        "currency": "USD",
+        "confidence": 0.45,
+        "notes": "Estimate for airport rail plus city transit."
+      },
+      {
+        "category": "food_drink",
+        "label": "Food and drink, 4 days",
+        "source": "manual",
+        "amount": 260.0,
+        "currency": "USD",
+        "confidence": 0.35,
+        "notes": "Moderate daily spend estimate."
+      },
+      {
+        "category": "buffer",
+        "label": "Trip buffer",
+        "source": "manual",
+        "amount": 100.0,
+        "currency": "USD",
+        "confidence": 0.4,
+        "notes": "Fees, taxis, lockers, and other dumb little charges."
+      }
+    ],
+    "reasons": [
+      "Composite score is 0.842.",
+      "Best event signal is Sanctum of Sound Festival in Berlin with relevance 0.86.",
+      "Estimated tracked cost is 855.00 USD against budget 900.00."
+    ],
+    "risks": [
+      "Manual findings need primary-source re-check before money changes hands.",
+      "Total trip estimate is incomplete; missing priced categories: transport, event.",
+      "Baggage and fare restrictions need primary-source verification."
+    ],
+    "next_actions": [
+      "Verify calendar availability.",
+      "Confirm fare and ticket availability on primary sources.",
+      "Prepare booking checklist; do not purchase automatically."
+    ]
+  },
+  {
+    "trip_name": "Amsterdam by rail",
+    "destination": "Amsterdam",
+    "decision": "watch",
+    "title": "Watch Amsterdam",
+    "summary": "Amsterdam from 2026-07-02 to 2026-07-05: 3 transport option(s), 2 event option(s), score 0.721.",
+    "score": 0.721,
+    "estimated_total_amount": null,
+    "estimated_total_currency": "MIXED",
+    "estimate_complete": false,
+    "missing_cost_categories": [
+      "event"
+    ],
+    "cost_breakdown": [
+      {
+        "category": "transport",
+        "label": "train: Cheltenham Spa to Amsterdam Centraal",
+        "source": "manual",
+        "amount": 130.0,
+        "currency": "EUR",
+        "confidence": 0.62,
+        "notes": "Eurostar advertises London-Amsterdam from GBP 39; Rome2Rio showed Cheltenham-Amsterdam train examples from about EUR 130."
+      },
+      {
+        "category": "accommodation",
+        "label": "Amsterdam mid-range hotel estimate",
+        "source": "manual",
+        "amount": 570.0,
+        "currency": "USD",
+        "confidence": 0.42,
+        "notes": "Amsterdam lodging can get stupid quickly; verify early and consider refundable."
+      },
+      {
+        "category": "local_transit",
+        "label": "Amsterdam airport/station transfers and GVB transit",
+        "source": "manual",
+        "amount": 55.0,
+        "currency": "USD",
+        "confidence": 0.45,
+        "notes": "Estimate for train/tram/metro use."
+      },
+      {
+        "category": "food_drink",
+        "label": "Food and drink, 4 days",
+        "source": "manual",
+        "amount": 280.0,
+        "currency": "USD",
+        "confidence": 0.35,
+        "notes": "Moderate daily spend estimate."
+      },
+      {
+        "category": "buffer",
+        "label": "Trip buffer",
+        "source": "manual",
+        "amount": 110.0,
+        "currency": "USD",
+        "confidence": 0.4,
+        "notes": "Fees, taxis, lockers, and nuisance costs."
+      }
+    ],
+    "reasons": [
+      "Composite score is 0.721.",
+      "Best event signal is Kevin Morby and Liam Kazar in Amsterdam with relevance 0.76.",
+      "Lowest tracked train option is 130.00 EUR."
+    ],
+    "risks": [
+      "Manual findings need primary-source re-check before money changes hands.",
+      "Tracked costs are not in the budget currency; convert before treating the budget score as reliable.",
+      "Total trip estimate is incomplete; missing priced categories: event.",
+      "Baggage and fare restrictions need primary-source verification."
+    ],
+    "next_actions": [
+      "Refresh transport prices from primary or aggregator sources.",
+      "Refresh concert discovery from Spotify, Bandsintown, Songkick, DICE, RA, and venue calendars.",
+      "Re-rank after calendar fit is confirmed."
+    ]
+  }
+]

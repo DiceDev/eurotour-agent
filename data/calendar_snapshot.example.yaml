@@ -1,0 +1,17 @@
+timezone: Europe/London
+range_start: "2026-07-01T00:00:00+01:00"
+range_end: "2026-07-31T23:59:00+01:00"
+busy_events:
+  - starts_at: "2026-07-06T09:00:00+01:00"
+    ends_at: "2026-07-06T17:00:00+01:00"
+    title: "Example work day"
+    source: manual
+  - starts_at: "2026-07-13T09:00:00+01:00"
+    ends_at: "2026-07-17T17:00:00+01:00"
+    title: "Example busy work week"
+    source: manual
+  - starts_at: "2026-07-24T18:00:00+01:00"
+    ends_at: "2026-07-26T20:00:00+01:00"
+    title: "Example weekend commitment"
+    source: manual
+
