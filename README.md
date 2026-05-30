@@ -66,6 +66,7 @@ python -m eurotour_agent.scheduler report
 python -m eurotour_agent.scheduler audit-run
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
+python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
 python -m eurotour_agent.scheduler attach-events "Berlin long weekend" --events local\ticketmaster_events.yaml
 python -m eurotour_agent.scheduler attach-transport "Berlin long weekend" --transport local\transport_options.yaml
 python -m eurotour_agent.scheduler attach-accommodation "Berlin long weekend" --accommodation local\accommodation_options.yaml
@@ -108,6 +109,8 @@ Use `data/manual_findings.example.yaml` as the shape for chat-researched fares, 
 Trip reports include transport, accommodation, event tickets, local transit, food/drink, and buffer estimates when those values are available.
 
 `data/trip_history.example.yaml` records prior trips, ratings, tags, likes, dislikes, and repeat signals. Add it to `refresh-watchlist` with `--history` so recommendations can learn from good past patterns while penalizing destinations that have become too repetitive. Computers, regrettably, will otherwise keep rediscovering Berlin forever.
+
+Use `suggest-destinations` to turn prior trip tags into new Europe destination ideas before adding them to the watchlist.
 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 

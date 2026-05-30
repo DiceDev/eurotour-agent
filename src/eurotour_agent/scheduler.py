@@ -11,6 +11,7 @@ from .audit import audit_research_run
 from .briefing import accommodation_template, events_template, render_research_brief, transport_template
 from .calendar import find_free_windows
 from .config import load_settings
+from .destinations import suggest_destinations
 from .google_calendar import (
     build_authorization_url as build_google_authorization_url,
     create_pkce_state as create_google_pkce_state,
@@ -260,6 +261,19 @@ def history_summary(
     trip_history = load_trip_history(history)
     for line in summarize_history(trip_history):
         typer.echo(line)
+
+
+@app.command("suggest-destinations")
+def suggest_destinations_command(
+    history: Path = typer.Option(Path("data/trip_history.example.yaml"), help="Prior trip history YAML path."),
+    limit: int = typer.Option(8, help="Maximum destination suggestions to print."),
+) -> None:
+    trip_history = load_trip_history(history)
+    suggestions = suggest_destinations(trip_history, limit=limit)
+    for index, suggestion in enumerate(suggestions, start=1):
+        typer.echo(f"{index}. {suggestion.city}, {suggestion.country} - score {suggestion.score:.3f}")
+        for reason in suggestion.reasons:
+            typer.echo(f"   - {reason}")
 
 
 @app.command("spotify-auth-url")

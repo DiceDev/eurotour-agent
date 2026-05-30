@@ -6,6 +6,7 @@ from typer.testing import CliRunner
 
 from eurotour_agent.audit import audit_research_run
 from eurotour_agent.calendar import find_free_windows
+from eurotour_agent.destinations import suggest_destinations
 from eurotour_agent.google_calendar import build_authorization_url as build_google_authorization_url
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
 from eurotour_agent.models import RecommendationDecision
@@ -79,6 +80,16 @@ def test_trip_history_adds_affinity_and_diversity_signals() -> None:
     assert research_run.trip_history is not None
     assert any("prior visit" in reason for reason in berlin.reasons)
     assert any("diversify" in risk for risk in berlin.risks)
+
+
+def test_destination_suggestions_use_history_without_repeating_it() -> None:
+    history = load_trip_history(ROOT / "data" / "trip_history.example.yaml")
+
+    suggestions = suggest_destinations(history, limit=5)
+
+    assert suggestions
+    assert all(suggestion.city != "Berlin" for suggestion in suggestions)
+    assert any("electronic" in suggestion.matched_tags or "walkable" in suggestion.matched_tags for suggestion in suggestions)
 
 
 def test_manual_findings_merge_and_calendar_score() -> None:
@@ -381,6 +392,25 @@ def test_cli_history_summary() -> None:
     assert result.exit_code == 0, result.output
     assert "Trips recorded: 4" in result.output
     assert "Average rating" in result.output
+
+
+def test_cli_suggest_destinations() -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "suggest-destinations",
+            "--history",
+            str(ROOT / "data" / "trip_history.example.yaml"),
+            "--limit",
+            "3",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "score" in result.output
+    assert "Matches prior liked tags" in result.output
 
 
 def test_cli_find_free_windows(tmp_path: Path) -> None:
