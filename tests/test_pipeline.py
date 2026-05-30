@@ -16,7 +16,7 @@ from eurotour_agent.models import RecommendationDecision
 from eurotour_agent.notifications import render_notification_digest
 from eurotour_agent.planner import rank_candidate_trips
 from eurotour_agent.prices import append_observations, observations_from_research_run, price_alerts
-from eurotour_agent.providers.amadeus import _transport_from_offer
+from eurotour_agent.providers.amadeus import _accommodation_from_hotel_offer, _transport_from_offer
 from eurotour_agent.providers.registry import provider_readiness_payload, source_reliability
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
 from eurotour_agent.research import build_research_run
@@ -376,6 +376,34 @@ def test_amadeus_flight_offer_normalization() -> None:
     assert option.price_amount == 148.2
     assert option.total_travel_time_hours == 4.58
     assert option.baggage_included is True
+
+
+def test_amadeus_hotel_offer_normalization() -> None:
+    option = _accommodation_from_hotel_offer(
+        {
+            "hotel": {
+                "name": "Example Hotel",
+                "cityCode": "BER",
+                "address": {"cityName": "Berlin"},
+            },
+            "offers": [
+                {
+                    "checkInDate": "2026-07-03",
+                    "checkOutDate": "2026-07-06",
+                    "price": {"currency": "EUR", "total": "420.00"},
+                    "policies": {"cancellations": [{"deadline": "2026-07-01T18:00:00"}]},
+                    "self": "https://example.com/offer",
+                }
+            ],
+        }
+    )
+
+    assert option.source == "amadeus"
+    assert option.name == "Example Hotel"
+    assert option.city == "BER"
+    assert option.total_price_amount == 420.0
+    assert option.nightly_price_amount == 140.0
+    assert option.refundable is True
 
 
 def test_report_includes_run_summary() -> None:
@@ -973,6 +1001,23 @@ def test_cli_amadeus_requires_credentials() -> None:
             "BRS",
             "BER",
             "--departure-date",
+            "2026-07-03",
+        ],
+    )
+
+    assert result.exit_code != 0
+    assert "AMADEUS_CLIENT_ID" in result.output
+
+
+def test_cli_amadeus_hotel_requires_credentials() -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "amadeus-hotel-offers",
+            "HLPAR266",
+            "--check-in-date",
             "2026-07-03",
         ],
     )

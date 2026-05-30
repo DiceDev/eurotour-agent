@@ -31,6 +31,7 @@ from .prices import append_observations, observations_from_research_run, price_a
 from .providers.registry import provider_readiness_payload, render_provider_readiness
 from .providers.amadeus import request_access_token as request_amadeus_access_token
 from .providers.amadeus import search_flight_offers
+from .providers.amadeus import search_hotel_offers
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
@@ -688,6 +689,33 @@ def amadeus_flight_search(
     )
     write_yaml(output, {"transport_options": [option.model_dump(mode="json") for option in options]})
     typer.echo(f"Wrote {len(options)} Amadeus flight option(s) to {output}")
+
+
+@app.command("amadeus-hotel-offers")
+def amadeus_hotel_offers(
+    hotel_ids: str = typer.Argument(..., help="Comma-separated Amadeus hotel IDs."),
+    check_in_date: datetime = typer.Option(..., formats=["%Y-%m-%d"], help="Check-in date."),
+    check_out_date: datetime | None = typer.Option(None, formats=["%Y-%m-%d"], help="Optional check-out date."),
+    output: Path = typer.Option(Path("local/amadeus_hotels.yaml"), help="Accommodation options YAML output path."),
+    adults: int = typer.Option(1, help="Adult travellers."),
+    room_quantity: int = typer.Option(1, help="Number of rooms."),
+    currency: str | None = typer.Option(None, help="Optional currency code."),
+) -> None:
+    settings = load_settings()
+    if not settings.amadeus_client_id or not settings.amadeus_client_secret:
+        raise typer.BadParameter("AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET are required in .env.local or the environment.")
+    token = request_amadeus_access_token(settings.amadeus_client_id, settings.amadeus_client_secret)
+    options = search_hotel_offers(
+        access_token=token["access_token"],
+        hotel_ids=[hotel_id.strip() for hotel_id in hotel_ids.split(",") if hotel_id.strip()],
+        check_in_date=check_in_date.date().isoformat(),
+        check_out_date=check_out_date.date().isoformat() if check_out_date else None,
+        adults=adults,
+        room_quantity=room_quantity,
+        currency=currency,
+    )
+    write_yaml(output, {"accommodation_options": [option.model_dump(mode="json") for option in options]})
+    typer.echo(f"Wrote {len(options)} Amadeus accommodation option(s) to {output}")
 
 
 @app.command("attach-events")
