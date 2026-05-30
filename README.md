@@ -111,6 +111,7 @@ For now, this chat can act as the recommendation engine while the project stores
 
 - `runs/latest/research_run.json`: normalized candidate trips from the latest refresh.
 - `runs/latest/summary.json`: compact machine-readable run manifest for notification layers.
+- `runs/latest/notification_digest.md`: sendable digest text for email, chat, or manual review.
 - `runs/latest/report.md`: readable recommendation report.
 - `runs/latest/monitoring_brief.md`: concise recommendation, price-alert, and destination-idea brief.
 
@@ -129,6 +130,8 @@ Use `draft-watchlist-destinations` to write those suggestions into a new watchli
 `data/price_history.example.yaml` stores repeated fare, lodging, and ticket observations. Use `price-alerts` to flag latest drops and new tracked lows.
 
 Use `daily-brief-run` for the routine agent pass. It writes the normalized research run, ranked recommendations, price alerts, detailed report, and monitoring brief in one output directory.
+
+Use `render-notification` to rebuild the sendable digest from a completed daily run without rerunning research.
 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 

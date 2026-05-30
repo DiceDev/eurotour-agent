@@ -4,6 +4,7 @@ The local automation target is `daily-brief-run`. It produces the files an autom
 
 - `research_run.json`
 - `summary.json`
+- `notification_digest.md`
 - `recommendations.json`
 - `price_alerts.json`
 - `report.md`
@@ -50,6 +51,17 @@ Register-ScheduledTask `
 ```
 
 This creates files locally only. It does not book anything, send messages, or spend API money. Good. Let the software earn trust before it gets a credit card.
+
+## Notification Digest
+
+The daily run writes `notification_digest.md`, a compact message suitable for email, chat, or manual review. Rebuild it from an existing run with:
+
+```powershell
+python -m eurotour_agent.scheduler render-notification `
+  --summary runs\latest\summary.json `
+  --monitoring-brief runs\latest\monitoring_brief.md `
+  --output runs\latest\notification_digest.md
+```
 
 ## Private Data
 

@@ -12,6 +12,7 @@ from eurotour_agent.google_calendar import build_authorization_url as build_goog
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
 from eurotour_agent.monitoring import render_monitoring_brief
 from eurotour_agent.models import RecommendationDecision
+from eurotour_agent.notifications import render_notification_digest
 from eurotour_agent.planner import rank_candidate_trips
 from eurotour_agent.prices import price_alerts
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
@@ -357,6 +358,32 @@ def test_monitoring_brief_combines_recommendations_prices_and_destinations() -> 
     assert "Leipzig" in brief
 
 
+def test_notification_digest_formats_summary() -> None:
+    digest = render_notification_digest(
+        {
+            "generated_at": "2026-05-30T08:00:00+01:00",
+            "candidate_trips": 2,
+            "recommendations": 2,
+            "price_alerts": 1,
+            "top_recommendation": {
+                "destination": "Amsterdam",
+                "decision": "research_needed",
+                "score": 0.819,
+                "estimated_total_amount": 1156.7,
+                "estimated_total_currency": "USD",
+                "reasons": ["Composite score is 0.819."],
+            },
+            "outputs": {"monitoring_brief": "runs/latest/monitoring_brief.md"},
+        },
+        monitoring_brief="## Price Alerts\n\n- Example drop.\n\n## Next Actions\n\n- Verify fares.",
+    )
+
+    assert "EuroTour Daily Digest" in digest
+    assert "Amsterdam" in digest
+    assert "Example drop" in digest
+    assert "advisory only" in digest
+
+
 def test_audit_research_run_flags_incomplete_data() -> None:
     watchlist_path = ROOT / "data" / "watchlist.example.yaml"
     findings_path = ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"
@@ -442,10 +469,48 @@ def test_cli_daily_brief_run(tmp_path: Path) -> None:
     assert (tmp_path / "report.md").exists()
     assert (tmp_path / "monitoring_brief.md").exists()
     assert (tmp_path / "summary.json").exists()
+    assert (tmp_path / "notification_digest.md").exists()
     assert "EuroTour Monitoring Brief" in (tmp_path / "monitoring_brief.md").read_text(encoding="utf-8")
+    assert "EuroTour Daily Digest" in (tmp_path / "notification_digest.md").read_text(encoding="utf-8")
     summary = (tmp_path / "summary.json").read_text(encoding="utf-8")
     assert '"price_alerts": 2' in summary
     assert '"top_recommendation"' in summary
+
+
+def test_cli_render_notification(tmp_path: Path) -> None:
+    runner = CliRunner()
+    run_result = runner.invoke(
+        app,
+        [
+            "daily-brief-run",
+            "--findings",
+            str(ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"),
+            "--history",
+            str(ROOT / "data" / "trip_history.example.yaml"),
+            "--prices",
+            str(ROOT / "data" / "price_history.example.yaml"),
+            "--output-dir",
+            str(tmp_path),
+        ],
+    )
+    assert run_result.exit_code == 0, run_result.output
+    output_path = tmp_path / "digest.md"
+
+    result = runner.invoke(
+        app,
+        [
+            "render-notification",
+            "--summary",
+            str(tmp_path / "summary.json"),
+            "--monitoring-brief",
+            str(tmp_path / "monitoring_brief.md"),
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert "EuroTour Daily Digest" in output_path.read_text(encoding="utf-8")
 
 
 def test_cli_refresh_accepts_trip_history(tmp_path: Path) -> None:

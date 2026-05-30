@@ -25,6 +25,7 @@ from .google_calendar import (
 from .history import summarize_history
 from .models import ManualFindings, ManualTripFindings
 from .monitoring import render_monitoring_brief
+from .notifications import render_notification_digest_from_files, render_notification_digest
 from .planner import rank_candidate_trips
 from .prices import price_alerts
 from .providers.ticketmaster import search_music_events
@@ -206,6 +207,13 @@ def daily_brief_run(
         },
     }
     (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    (output_dir / "notification_digest.md").write_text(
+        render_notification_digest(
+            summary,
+            monitoring_brief=(output_dir / "monitoring_brief.md").read_text(encoding="utf-8"),
+        ),
+        encoding="utf-8",
+    )
     typer.echo(
         f"Wrote daily brief run to {output_dir}: "
         f"{len(recommendations)} recommendation(s), {len(alerts)} price alert(s)."
@@ -244,6 +252,23 @@ def report(
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(render_markdown_report(research_run), encoding="utf-8")
     typer.echo(f"Wrote report to {output}")
+
+
+@app.command("render-notification")
+def render_notification(
+    summary: Path = typer.Option(Path("runs/latest/summary.json"), help="Daily run summary JSON path."),
+    monitoring_brief: Path | None = typer.Option(
+        Path("runs/latest/monitoring_brief.md"),
+        help="Optional monitoring brief markdown path.",
+    ),
+    output: Path = typer.Option(Path("runs/latest/notification_digest.md"), help="Notification digest markdown output."),
+) -> None:
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        render_notification_digest_from_files(summary, monitoring_brief_path=monitoring_brief),
+        encoding="utf-8",
+    )
+    typer.echo(f"Wrote notification digest to {output}")
 
 
 @app.command("audit-run")
