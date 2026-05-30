@@ -29,6 +29,8 @@ from .notifications import render_notification_digest_from_files, render_notific
 from .planner import rank_candidate_trips
 from .prices import append_observations, observations_from_research_run, price_alerts
 from .providers.registry import provider_readiness_payload, render_provider_readiness
+from .providers.amadeus import request_access_token as request_amadeus_access_token
+from .providers.amadeus import search_flight_offers
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
@@ -655,6 +657,37 @@ def ticketmaster_search(
     )
     write_yaml(output, {"event_options": [event.model_dump(mode="json") for event in events]})
     typer.echo(f"Wrote {len(events)} Ticketmaster event option(s) to {output}")
+
+
+@app.command("amadeus-flight-search")
+def amadeus_flight_search(
+    origin: str = typer.Argument(..., help="Origin airport/city IATA code, e.g. BRS."),
+    destination: str = typer.Argument(..., help="Destination airport/city IATA code, e.g. BER."),
+    departure_date: datetime = typer.Option(..., formats=["%Y-%m-%d"], help="Departure date."),
+    return_date: datetime | None = typer.Option(None, formats=["%Y-%m-%d"], help="Optional return date."),
+    output: Path = typer.Option(Path("local/amadeus_flights.yaml"), help="Transport options YAML output path."),
+    adults: int = typer.Option(1, help="Adult travellers."),
+    currency: str | None = typer.Option(None, help="Optional currency code."),
+    max_results: int = typer.Option(10, help="Maximum offers to fetch."),
+    non_stop: bool | None = typer.Option(None, help="Whether to restrict to non-stop offers."),
+) -> None:
+    settings = load_settings()
+    if not settings.amadeus_client_id or not settings.amadeus_client_secret:
+        raise typer.BadParameter("AMADEUS_CLIENT_ID and AMADEUS_CLIENT_SECRET are required in .env.local or the environment.")
+    token = request_amadeus_access_token(settings.amadeus_client_id, settings.amadeus_client_secret)
+    options = search_flight_offers(
+        access_token=token["access_token"],
+        origin=origin,
+        destination=destination,
+        departure_date=departure_date.date().isoformat(),
+        return_date=return_date.date().isoformat() if return_date else None,
+        adults=adults,
+        currency=currency,
+        max_results=max_results,
+        non_stop=non_stop,
+    )
+    write_yaml(output, {"transport_options": [option.model_dump(mode="json") for option in options]})
+    typer.echo(f"Wrote {len(options)} Amadeus flight option(s) to {output}")
 
 
 @app.command("attach-events")

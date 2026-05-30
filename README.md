@@ -78,6 +78,7 @@ python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
 python -m eurotour_agent.scheduler draft-watchlist-destinations --history data\trip_history.example.yaml --earliest-start 2026-10-01 --latest-end 2026-12-31 --limit 3
+python -m eurotour_agent.scheduler amadeus-flight-search BRS BER --departure-date 2026-07-03 --return-date 2026-07-06
 python -m eurotour_agent.scheduler attach-events "Berlin long weekend" --events local\ticketmaster_events.yaml
 python -m eurotour_agent.scheduler attach-transport "Berlin long weekend" --transport local\transport_options.yaml
 python -m eurotour_agent.scheduler attach-accommodation "Berlin long weekend" --accommodation local\accommodation_options.yaml
@@ -143,3 +144,5 @@ Use `render-notification` to rebuild the sendable digest from a completed daily 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 
 Spotify integration is optional. Use `spotify-auth-url`, `spotify-exchange-code`, and `spotify-import-taste` after setting `SPOTIFY_CLIENT_ID` and an allowed redirect URI in `.env.local`. Token files under `data/spotify/` are ignored by git.
+
+Amadeus flight search is optional. Set `AMADEUS_CLIENT_ID` and `AMADEUS_CLIENT_SECRET`, then use `amadeus-flight-search` to write normalized flight `transport_options`; confirm prices with Amadeus Flight Offers Price or the airline before booking.
