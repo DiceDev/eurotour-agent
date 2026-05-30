@@ -28,6 +28,7 @@ This project is scaffolded as API-ready but API-optional. The first version can 
 |   +-- concert-discovery-playbook.md
 |   +-- chat-operated-workflow.md
 |   +-- provider-notes.md
+|   +-- routine-automation.md
 +-- data/
 |   +-- watchlist.example.yaml
 |   +-- trip_history.example.yaml
@@ -48,6 +49,8 @@ This project is scaffolded as API-ready but API-optional. The first version can 
 +-- .env.example
 +-- .gitignore
 +-- pyproject.toml
++-- scripts/
+|   +-- daily_brief.ps1
 ```
 
 ## Quick Start
@@ -93,6 +96,8 @@ No secrets are required for the dry-run scaffold.
 ## Development
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, validation commands, and the rules for keeping real tokens and personal data out of git.
+
+See [docs/routine-automation.md](docs/routine-automation.md) for the daily brief command and Windows Task Scheduler setup.
 
 ## Current Cost Posture
 
