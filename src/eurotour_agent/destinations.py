@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
 from .history import destination_repeat_count
-from .models import TripHistory
+from .models import TripHistory, WatchFlags, WatchedTrip
 
 
 @dataclass(frozen=True)
@@ -51,6 +52,44 @@ def suggest_destinations(history: TripHistory | None, limit: int = 8) -> list[De
     return sorted(suggestions, key=lambda item: item.score, reverse=True)[:limit]
 
 
+def draft_watched_trips(
+    history: TripHistory | None,
+    existing_destinations: set[str],
+    earliest_start: date,
+    latest_end: date,
+    limit: int,
+    budget_limit: float | None,
+    nights_min: int = 3,
+    nights_max: int = 5,
+) -> list[WatchedTrip]:
+    suggestions = suggest_destinations(history, limit=len(DESTINATION_CATALOG))
+    drafted: list[WatchedTrip] = []
+    normalized_existing = {destination.casefold() for destination in existing_destinations}
+    for suggestion in suggestions:
+        if suggestion.city.casefold() in normalized_existing:
+            continue
+        drafted.append(
+            WatchedTrip(
+                name=f"{suggestion.city} discovery scout",
+                destination=suggestion.city,
+                earliest_start=earliest_start,
+                latest_end=latest_end,
+                nights_min=nights_min,
+                nights_max=nights_max,
+                budget_limit=budget_limit,
+                watch=WatchFlags(
+                    flights=True,
+                    trains=_profile_for_city(suggestion.city).rail_friendliness >= 0.65,
+                    concerts=True,
+                ),
+                notes=_draft_notes(suggestion),
+            )
+        )
+        if len(drafted) >= limit:
+            break
+    return drafted
+
+
 def _score_destination(
     destination: DestinationProfile,
     preferred_tags: set[str],
@@ -76,6 +115,18 @@ def _score_destination(
         matched_tags=matched_tags,
         reasons=reasons,
     )
+
+
+def _profile_for_city(city: str) -> DestinationProfile:
+    for destination in DESTINATION_CATALOG:
+        if destination.city.casefold() == city.casefold():
+            return destination
+    raise KeyError(f"Unknown destination profile for {city!r}.")
+
+
+def _draft_notes(suggestion: DestinationSuggestion) -> str:
+    tags = ", ".join(suggestion.matched_tags) if suggestion.matched_tags else "new variety"
+    return f"Suggested from trip history. Score {suggestion.score:.3f}; matched tags: {tags}."
 
 
 def _preferred_tags(history: TripHistory | None) -> set[str]:

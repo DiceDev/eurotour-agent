@@ -67,6 +67,7 @@ python -m eurotour_agent.scheduler audit-run
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
+python -m eurotour_agent.scheduler draft-watchlist-destinations --history data\trip_history.example.yaml --earliest-start 2026-10-01 --latest-end 2026-12-31 --limit 3
 python -m eurotour_agent.scheduler attach-events "Berlin long weekend" --events local\ticketmaster_events.yaml
 python -m eurotour_agent.scheduler attach-transport "Berlin long weekend" --transport local\transport_options.yaml
 python -m eurotour_agent.scheduler attach-accommodation "Berlin long weekend" --accommodation local\accommodation_options.yaml
@@ -111,6 +112,8 @@ Trip reports include transport, accommodation, event tickets, local transit, foo
 `data/trip_history.example.yaml` records prior trips, ratings, tags, likes, dislikes, and repeat signals. Add it to `refresh-watchlist` with `--history` so recommendations can learn from good past patterns while penalizing destinations that have become too repetitive. Computers, regrettably, will otherwise keep rediscovering Berlin forever.
 
 Use `suggest-destinations` to turn prior trip tags into new Europe destination ideas before adding them to the watchlist.
+
+Use `draft-watchlist-destinations` to write those suggestions into a new watchlist file under `local/`, ready for `refresh-watchlist`.
 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 

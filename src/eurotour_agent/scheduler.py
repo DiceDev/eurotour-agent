@@ -11,7 +11,7 @@ from .audit import audit_research_run
 from .briefing import accommodation_template, events_template, render_research_brief, transport_template
 from .calendar import find_free_windows
 from .config import load_settings
-from .destinations import suggest_destinations
+from .destinations import draft_watched_trips, suggest_destinations
 from .google_calendar import (
     build_authorization_url as build_google_authorization_url,
     create_pkce_state as create_google_pkce_state,
@@ -274,6 +274,36 @@ def suggest_destinations_command(
         typer.echo(f"{index}. {suggestion.city}, {suggestion.country} - score {suggestion.score:.3f}")
         for reason in suggestion.reasons:
             typer.echo(f"   - {reason}")
+
+
+@app.command("draft-watchlist-destinations")
+def draft_watchlist_destinations(
+    watchlist: Path = typer.Option(Path("data/watchlist.example.yaml"), help="Source watchlist YAML path."),
+    history: Path = typer.Option(Path("data/trip_history.example.yaml"), help="Prior trip history YAML path."),
+    output: Path = typer.Option(Path("local/watchlist.suggested.yaml"), help="Output watchlist YAML path."),
+    earliest_start: datetime = typer.Option(..., formats=["%Y-%m-%d"], help="Earliest date for drafted trips."),
+    latest_end: datetime = typer.Option(..., formats=["%Y-%m-%d"], help="Latest date for drafted trips."),
+    limit: int = typer.Option(5, help="Maximum new watched trips to add."),
+    budget_limit: float | None = typer.Option(None, help="Optional budget limit for drafted trips."),
+    nights_min: int = typer.Option(3, help="Minimum nights for drafted trips."),
+    nights_max: int = typer.Option(5, help="Maximum nights for drafted trips."),
+) -> None:
+    watchlist_model = load_watchlist(watchlist)
+    trip_history = load_trip_history(history)
+    existing_destinations = {trip.destination for trip in watchlist_model.watched_trips}
+    drafted = draft_watched_trips(
+        history=trip_history,
+        existing_destinations=existing_destinations,
+        earliest_start=earliest_start.date(),
+        latest_end=latest_end.date(),
+        limit=limit,
+        budget_limit=budget_limit or watchlist_model.profile.max_trip_budget,
+        nights_min=nights_min,
+        nights_max=nights_max,
+    )
+    updated = watchlist_model.model_copy(update={"watched_trips": [*watchlist_model.watched_trips, *drafted]})
+    write_yaml(output, updated.model_dump(mode="json"))
+    typer.echo(f"Wrote watchlist with {len(drafted)} suggested destination(s) to {output}")
 
 
 @app.command("spotify-auth-url")

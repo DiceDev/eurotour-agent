@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+from datetime import date
 from pathlib import Path
 
 from typer.testing import CliRunner
 
 from eurotour_agent.audit import audit_research_run
 from eurotour_agent.calendar import find_free_windows
-from eurotour_agent.destinations import suggest_destinations
+from eurotour_agent.destinations import draft_watched_trips, suggest_destinations
 from eurotour_agent.google_calendar import build_authorization_url as build_google_authorization_url
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
 from eurotour_agent.models import RecommendationDecision
@@ -90,6 +91,24 @@ def test_destination_suggestions_use_history_without_repeating_it() -> None:
     assert suggestions
     assert all(suggestion.city != "Berlin" for suggestion in suggestions)
     assert any("electronic" in suggestion.matched_tags or "walkable" in suggestion.matched_tags for suggestion in suggestions)
+
+
+def test_draft_watched_trips_skips_existing_destinations() -> None:
+    history = load_trip_history(ROOT / "data" / "trip_history.example.yaml")
+
+    drafted = draft_watched_trips(
+        history=history,
+        existing_destinations={"Berlin", "Amsterdam"},
+        earliest_start=date(2026, 10, 1),
+        latest_end=date(2026, 12, 31),
+        limit=3,
+        budget_limit=1000,
+    )
+
+    assert len(drafted) == 3
+    assert drafted[0].destination == "Leipzig"
+    assert all(trip.destination not in {"Berlin", "Amsterdam"} for trip in drafted)
+    assert drafted[0].watch.concerts is True
 
 
 def test_manual_findings_merge_and_calendar_score() -> None:
@@ -411,6 +430,35 @@ def test_cli_suggest_destinations() -> None:
     assert result.exit_code == 0, result.output
     assert "score" in result.output
     assert "Matches prior liked tags" in result.output
+
+
+def test_cli_draft_watchlist_destinations(tmp_path: Path) -> None:
+    runner = CliRunner()
+    output_path = tmp_path / "watchlist.suggested.yaml"
+
+    result = runner.invoke(
+        app,
+        [
+            "draft-watchlist-destinations",
+            "--watchlist",
+            str(ROOT / "data" / "watchlist.example.yaml"),
+            "--history",
+            str(ROOT / "data" / "trip_history.example.yaml"),
+            "--output",
+            str(output_path),
+            "--earliest-start",
+            "2026-10-01",
+            "--latest-end",
+            "2026-12-31",
+            "--limit",
+            "2",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    watchlist = load_watchlist(output_path)
+    assert len(watchlist.watched_trips) == 4
+    assert any(trip.destination == "Leipzig" for trip in watchlist.watched_trips)
 
 
 def test_cli_find_free_windows(tmp_path: Path) -> None:
