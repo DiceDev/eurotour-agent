@@ -411,6 +411,39 @@ def test_cli_refresh_rank_report(tmp_path: Path) -> None:
     assert "EuroTour Agent Report" in report_path.read_text(encoding="utf-8")
 
 
+def test_cli_daily_brief_run(tmp_path: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "daily-brief-run",
+            "--watchlist",
+            str(ROOT / "data" / "watchlist.example.yaml"),
+            "--findings",
+            str(ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"),
+            "--music-taste",
+            str(ROOT / "data" / "music_taste" / "sample.yaml"),
+            "--rates",
+            str(ROOT / "data" / "currency_rates.example.yaml"),
+            "--history",
+            str(ROOT / "data" / "trip_history.example.yaml"),
+            "--prices",
+            str(ROOT / "data" / "price_history.example.yaml"),
+            "--output-dir",
+            str(tmp_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    assert (tmp_path / "research_run.json").exists()
+    assert (tmp_path / "recommendations.json").exists()
+    assert (tmp_path / "price_alerts.json").exists()
+    assert (tmp_path / "report.md").exists()
+    assert (tmp_path / "monitoring_brief.md").exists()
+    assert "EuroTour Monitoring Brief" in (tmp_path / "monitoring_brief.md").read_text(encoding="utf-8")
+
+
 def test_cli_refresh_accepts_trip_history(tmp_path: Path) -> None:
     runner = CliRunner()
     run_path = tmp_path / "run.json"

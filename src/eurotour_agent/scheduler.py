@@ -136,6 +136,66 @@ def refresh_trip(
     typer.echo(f"Wrote {len(research_run.candidate_trips)} candidate trip(s) to {output}")
 
 
+@app.command("daily-brief-run")
+def daily_brief_run(
+    watchlist: Path = typer.Option(Path("data/watchlist.example.yaml"), help="Watchlist YAML path."),
+    output_dir: Path = typer.Option(Path("runs/latest"), help="Directory for run outputs."),
+    findings: Path | None = typer.Option(None, help="Optional manual findings YAML path."),
+    music_taste: Path | None = typer.Option(None, help="Optional music taste YAML path."),
+    rates: Path | None = typer.Option(None, help="Optional currency rates YAML path."),
+    history: Path | None = typer.Option(None, help="Optional prior trip history YAML path."),
+    prices: Path | None = typer.Option(None, help="Optional price history YAML path."),
+    drop_threshold_percent: float = typer.Option(10.0, help="Price drop alert threshold."),
+    dry_run: bool = typer.Option(True, help="Use deterministic local fixtures instead of live provider calls."),
+) -> None:
+    watchlist_model = load_watchlist(watchlist)
+    manual_findings = load_manual_findings(findings) if findings else None
+    music_taste_model = load_music_taste(music_taste) if music_taste else None
+    currency_rates = load_currency_rates(rates) if rates else None
+    trip_history = load_trip_history(history) if history else None
+    price_history = load_price_history(prices) if prices else None
+    research_run = build_research_run(
+        watchlist_model,
+        watchlist_path=str(watchlist),
+        dry_run=dry_run,
+        manual_findings=manual_findings,
+        music_taste=music_taste_model,
+        currency_rates=currency_rates,
+        trip_history=trip_history,
+    )
+    recommendations = rank_candidate_trips(
+        calendar_windows=research_run.calendar_windows,
+        candidate_trips=research_run.candidate_trips,
+        currency_rates=research_run.currency_rates,
+        trip_history=research_run.trip_history,
+    )
+    alerts = price_alerts(price_history, drop_threshold_percent=drop_threshold_percent) if price_history else []
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    write_model(output_dir / "research_run.json", research_run)
+    (output_dir / "recommendations.json").write_text(
+        json.dumps([recommendation.model_dump(mode="json") for recommendation in recommendations], indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "price_alerts.json").write_text(
+        json.dumps([alert.model_dump(mode="json") for alert in alerts], indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (output_dir / "report.md").write_text(render_markdown_report(research_run), encoding="utf-8")
+    (output_dir / "monitoring_brief.md").write_text(
+        render_monitoring_brief(
+            research_run=research_run,
+            price_history=price_history,
+            drop_threshold_percent=drop_threshold_percent,
+        ),
+        encoding="utf-8",
+    )
+    typer.echo(
+        f"Wrote daily brief run to {output_dir}: "
+        f"{len(recommendations)} recommendation(s), {len(alerts)} price alert(s)."
+    )
+
+
 @app.command("rank")
 def rank(
     input_path: Path = typer.Option(Path("runs/latest/research_run.json"), "--input", help="Research run JSON input."),

@@ -62,6 +62,7 @@ python -m eurotour_agent.scheduler refresh-watchlist --findings data\manual_find
 python -m eurotour_agent.scheduler find-free-windows --calendar data\calendar_snapshot.example.yaml
 python -m eurotour_agent.scheduler refresh-watchlist --findings data\manual_findings.sample-2026-05-30.yaml --music-taste data\music_taste\sample.yaml --rates data\currency_rates.example.yaml
 python -m eurotour_agent.scheduler refresh-watchlist --history data\trip_history.example.yaml
+python -m eurotour_agent.scheduler daily-brief-run --findings data\manual_findings.sample-2026-05-30.yaml --music-taste data\music_taste\sample.yaml --rates data\currency_rates.example.yaml --history data\trip_history.example.yaml --prices data\price_history.example.yaml
 python -m eurotour_agent.scheduler rank
 python -m eurotour_agent.scheduler report
 python -m eurotour_agent.scheduler audit-run
@@ -120,6 +121,8 @@ Use `suggest-destinations` to turn prior trip tags into new Europe destination i
 Use `draft-watchlist-destinations` to write those suggestions into a new watchlist file under `local/`, ready for `refresh-watchlist`.
 
 `data/price_history.example.yaml` stores repeated fare, lodging, and ticket observations. Use `price-alerts` to flag latest drops and new tracked lows.
+
+Use `daily-brief-run` for the routine agent pass. It writes the normalized research run, ranked recommendations, price alerts, detailed report, and monitoring brief in one output directory.
 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 
