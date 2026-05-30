@@ -25,6 +25,7 @@ from .google_calendar import (
 from .history import summarize_history
 from .models import ManualFindings, ManualTripFindings
 from .planner import rank_candidate_trips
+from .prices import price_alerts
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
@@ -45,6 +46,7 @@ from .storage import (
     load_event_options,
     load_manual_findings,
     load_music_taste,
+    load_price_history,
     load_research_run,
     load_transport_options,
     load_trip_history,
@@ -229,7 +231,7 @@ def validate_file(
     path: Path = typer.Argument(..., help="File to validate."),
     kind: str = typer.Option(
         "findings",
-        help="One of: watchlist, findings, calendar, music-taste, rates, history, events, transport, accommodation, research-run.",
+        help="One of: watchlist, findings, calendar, music-taste, rates, history, price-history, events, transport, accommodation, research-run.",
     ),
 ) -> None:
     validators = {
@@ -239,6 +241,7 @@ def validate_file(
         "music-taste": load_music_taste,
         "rates": load_currency_rates,
         "history": load_trip_history,
+        "price-history": load_price_history,
         "events": load_event_options,
         "transport": load_transport_options,
         "accommodation": load_accommodation_options,
@@ -252,6 +255,23 @@ def validate_file(
     except (ValidationError, ValueError, KeyError, TypeError) as exc:
         raise typer.BadParameter(f"{path} is not valid {kind}: {exc}") from exc
     typer.echo(f"OK: {path} is valid {kind}")
+
+
+@app.command("price-alerts")
+def price_alerts_command(
+    history: Path = typer.Option(Path("data/price_history.example.yaml"), help="Price history YAML path."),
+    output: Path | None = typer.Option(None, help="Optional price alerts JSON output path."),
+    drop_threshold_percent: float = typer.Option(10.0, help="Alert when latest price drops by at least this percent."),
+) -> None:
+    price_history = load_price_history(history)
+    alerts = price_alerts(price_history, drop_threshold_percent=drop_threshold_percent)
+    payload = [alert.model_dump(mode="json") for alert in alerts]
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        typer.echo(f"Wrote {len(alerts)} price alert(s) to {output}")
+        return
+    typer.echo(json.dumps(payload, indent=2))
 
 
 @app.command("history-summary")

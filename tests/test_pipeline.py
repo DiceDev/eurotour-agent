@@ -12,6 +12,7 @@ from eurotour_agent.google_calendar import build_authorization_url as build_goog
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
 from eurotour_agent.models import RecommendationDecision
 from eurotour_agent.planner import rank_candidate_trips
+from eurotour_agent.prices import price_alerts
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
 from eurotour_agent.research import build_research_run
 from eurotour_agent.scheduler import app
@@ -21,6 +22,7 @@ from eurotour_agent.storage import (
     load_currency_rates,
     load_manual_findings,
     load_music_taste,
+    load_price_history,
     load_research_run,
     load_trip_history,
     load_watchlist,
@@ -44,6 +46,19 @@ def test_trip_history_loads() -> None:
     assert len(history.trips) == 4
     assert history.trips[0].destination == "Berlin"
     assert history.trips[0].rating == 4.6
+
+
+def test_price_history_alerts_on_latest_drop() -> None:
+    history = load_price_history(ROOT / "data" / "price_history.example.yaml")
+
+    alerts = price_alerts(history, drop_threshold_percent=10)
+
+    assert len(alerts) == 2
+    assert alerts[0].watched_trip == "Berlin long weekend"
+    assert alerts[0].is_new_low is True
+    assert alerts[0].drop_percent == 20.0
+    assert alerts[1].watched_trip == "Amsterdam by rail"
+    assert alerts[1].is_new_low is True
 
 
 def test_research_run_generates_fixture_candidates() -> None:
@@ -729,6 +744,29 @@ transport_options:
 
     assert result.exit_code == 0, result.output
     assert "valid transport" in result.output
+
+
+def test_cli_price_alerts(tmp_path: Path) -> None:
+    runner = CliRunner()
+    output_path = tmp_path / "price_alerts.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "price-alerts",
+            "--history",
+            str(ROOT / "data" / "price_history.example.yaml"),
+            "--output",
+            str(output_path),
+            "--drop-threshold-percent",
+            "10",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    output_text = output_path.read_text(encoding="utf-8")
+    assert "Berlin long weekend" in output_text
+    assert "drop_percent" in output_text
 
 
 def test_cli_audit_run_flags_sample(tmp_path: Path) -> None:

@@ -235,6 +235,37 @@ class CostComponent(BaseModel):
     notes: str | None = None
 
 
+class PriceObservation(BaseModel):
+    watched_trip: str
+    category: CostCategory
+    label: str
+    source: str = "manual"
+    amount: float = Field(ge=0)
+    currency: str = "USD"
+    observed_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
+    url: str | None = None
+    notes: str | None = None
+
+
+class PriceHistory(BaseModel):
+    observations: list[PriceObservation] = Field(default_factory=list)
+
+
+class PriceAlert(BaseModel):
+    watched_trip: str
+    category: CostCategory
+    label: str
+    current_amount: float
+    previous_low_amount: float | None = None
+    currency: str
+    drop_percent: float | None = None
+    is_new_low: bool = False
+    observed_at: datetime
+    source: str
+    url: str | None = None
+    reason: str
+
+
 class CurrencyRate(BaseModel):
     from_currency: str
     to_currency: str

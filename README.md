@@ -31,6 +31,7 @@ This project is scaffolded as API-ready but API-optional. The first version can 
 +-- data/
 |   +-- watchlist.example.yaml
 |   +-- trip_history.example.yaml
+|   +-- price_history.example.yaml
 +-- src/
 |   +-- eurotour_agent/
 |       +-- __init__.py
@@ -64,6 +65,7 @@ python -m eurotour_agent.scheduler refresh-watchlist --history data\trip_history
 python -m eurotour_agent.scheduler rank
 python -m eurotour_agent.scheduler report
 python -m eurotour_agent.scheduler audit-run
+python -m eurotour_agent.scheduler price-alerts --history data\price_history.example.yaml
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
@@ -114,6 +116,8 @@ Trip reports include transport, accommodation, event tickets, local transit, foo
 Use `suggest-destinations` to turn prior trip tags into new Europe destination ideas before adding them to the watchlist.
 
 Use `draft-watchlist-destinations` to write those suggestions into a new watchlist file under `local/`, ready for `refresh-watchlist`.
+
+`data/price_history.example.yaml` stores repeated fare, lodging, and ticket observations. Use `price-alerts` to flag latest drops and new tracked lows.
 
 `data/calendar_snapshot.example.yaml` shows the shape future Google Calendar reads should feed into the app: busy events in, free travel windows out.
 

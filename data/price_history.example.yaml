@@ -1,0 +1,47 @@
+observations:
+  - watched_trip: Berlin long weekend
+    category: transport
+    label: BRS to BER flight
+    source: manual
+    amount: 165
+    currency: GBP
+    observed_at: "2026-05-24T09:00:00+01:00"
+    url: https://example.com/berlin-flight
+    notes: Carry-on only.
+  - watched_trip: Berlin long weekend
+    category: transport
+    label: BRS to BER flight
+    source: manual
+    amount: 132
+    currency: GBP
+    observed_at: "2026-05-30T09:00:00+01:00"
+    url: https://example.com/berlin-flight
+    notes: Same schedule class as prior check.
+  - watched_trip: Amsterdam by rail
+    category: transport
+    label: Cheltenham Spa to Amsterdam Centraal rail
+    source: manual
+    amount: 155
+    currency: EUR
+    observed_at: "2026-05-24T10:00:00+01:00"
+  - watched_trip: Amsterdam by rail
+    category: transport
+    label: Cheltenham Spa to Amsterdam Centraal rail
+    source: manual
+    amount: 142
+    currency: EUR
+    observed_at: "2026-05-30T10:00:00+01:00"
+  - watched_trip: Amsterdam by rail
+    category: accommodation
+    label: Amsterdam mid-range hotel estimate
+    source: manual
+    amount: 570
+    currency: USD
+    observed_at: "2026-05-24T10:00:00+01:00"
+  - watched_trip: Amsterdam by rail
+    category: accommodation
+    label: Amsterdam mid-range hotel estimate
+    source: manual
+    amount: 590
+    currency: USD
+    observed_at: "2026-05-30T10:00:00+01:00"

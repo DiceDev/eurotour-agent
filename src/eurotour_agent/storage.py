@@ -14,6 +14,7 @@ from .models import (
     EventOption,
     ManualFindings,
     MusicTasteProfile,
+    PriceHistory,
     ResearchRun,
     TransportOption,
     TripHistory,
@@ -63,6 +64,12 @@ def load_trip_history(path: Path) -> TripHistory:
     with path.open("r", encoding="utf-8") as handle:
         data = yaml.safe_load(handle) or {}
     return TripHistory.model_validate(data)
+
+
+def load_price_history(path: Path) -> PriceHistory:
+    with path.open("r", encoding="utf-8") as handle:
+        data = yaml.safe_load(handle) or {}
+    return PriceHistory.model_validate(data)
 
 
 def load_event_options(path: Path) -> list[EventOption]:
