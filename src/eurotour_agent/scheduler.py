@@ -23,11 +23,11 @@ from .google_calendar import (
     write_token as write_google_token,
 )
 from .history import summarize_history
-from .models import ManualFindings, ManualTripFindings
+from .models import ManualFindings, ManualTripFindings, PriceHistory
 from .monitoring import render_monitoring_brief
 from .notifications import render_notification_digest_from_files, render_notification_digest
 from .planner import rank_candidate_trips
-from .prices import price_alerts
+from .prices import append_observations, observations_from_research_run, price_alerts
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
@@ -374,6 +374,23 @@ def price_alerts_command(
         typer.echo(f"Wrote {len(alerts)} price alert(s) to {output}")
         return
     typer.echo(json.dumps(payload, indent=2))
+
+
+@app.command("extract-price-observations")
+def extract_price_observations(
+    input_path: Path = typer.Option(Path("runs/latest/research_run.json"), "--input", help="Research run JSON input."),
+    output: Path = typer.Option(Path("local/price_history.extracted.yaml"), help="Price history YAML output path."),
+    existing: Path | None = typer.Option(None, help="Optional existing price history YAML to append to."),
+) -> None:
+    research_run = load_research_run(input_path)
+    extracted = observations_from_research_run(research_run)
+    price_history = load_price_history(existing) if existing else None
+    if price_history is not None:
+        result = append_observations(price_history, extracted)
+    else:
+        result = PriceHistory(observations=extracted)
+    write_yaml(output, result.model_dump(mode="json"))
+    typer.echo(f"Wrote {len(result.observations)} price observation(s) to {output}")
 
 
 @app.command("monitoring-brief")

@@ -70,6 +70,7 @@ python -m eurotour_agent.scheduler rank
 python -m eurotour_agent.scheduler report
 python -m eurotour_agent.scheduler audit-run
 python -m eurotour_agent.scheduler price-alerts --history data\price_history.example.yaml
+python -m eurotour_agent.scheduler extract-price-observations --input runs\latest\research_run.json --existing data\price_history.example.yaml --output local\price_history.updated.yaml
 python -m eurotour_agent.scheduler monitoring-brief --input runs\latest\research_run.json --prices data\price_history.example.yaml --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
@@ -128,6 +129,8 @@ Use `suggest-destinations` to turn prior trip tags into new Europe destination i
 Use `draft-watchlist-destinations` to write those suggestions into a new watchlist file under `local/`, ready for `refresh-watchlist`.
 
 `data/price_history.example.yaml` stores repeated fare, lodging, and ticket observations. Use `price-alerts` to flag latest drops and new tracked lows.
+
+Use `extract-price-observations` to turn a completed research run into price history entries, optionally appended to an existing price history file.
 
 Use `daily-brief-run` for the routine agent pass. It writes the normalized research run, ranked recommendations, price alerts, detailed report, and monitoring brief in one output directory.
 

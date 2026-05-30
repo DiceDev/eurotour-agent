@@ -14,7 +14,7 @@ from eurotour_agent.monitoring import render_monitoring_brief
 from eurotour_agent.models import RecommendationDecision
 from eurotour_agent.notifications import render_notification_digest
 from eurotour_agent.planner import rank_candidate_trips
-from eurotour_agent.prices import price_alerts
+from eurotour_agent.prices import append_observations, observations_from_research_run, price_alerts
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
 from eurotour_agent.research import build_research_run
 from eurotour_agent.scheduler import app
@@ -61,6 +61,21 @@ def test_price_history_alerts_on_latest_drop() -> None:
     assert alerts[0].drop_percent == 20.0
     assert alerts[1].watched_trip == "Amsterdam by rail"
     assert alerts[1].is_new_low is True
+
+
+def test_research_run_extracts_price_observations() -> None:
+    watchlist_path = ROOT / "data" / "watchlist.example.yaml"
+    findings_path = ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"
+    watchlist = load_watchlist(watchlist_path)
+    findings = load_manual_findings(findings_path)
+    research_run = build_research_run(watchlist, watchlist_path=str(watchlist_path), manual_findings=findings)
+
+    observations = observations_from_research_run(research_run)
+    merged = append_observations(load_price_history(ROOT / "data" / "price_history.example.yaml"), observations)
+
+    assert observations
+    assert any(observation.category.value == "transport" for observation in observations)
+    assert len(merged.observations) >= len(observations)
 
 
 def test_research_run_generates_fixture_candidates() -> None:
@@ -894,6 +909,41 @@ def test_cli_price_alerts(tmp_path: Path) -> None:
     output_text = output_path.read_text(encoding="utf-8")
     assert "Berlin long weekend" in output_text
     assert "drop_percent" in output_text
+
+
+def test_cli_extract_price_observations(tmp_path: Path) -> None:
+    runner = CliRunner()
+    run_path = tmp_path / "run.json"
+    output_path = tmp_path / "price_history.yaml"
+    refresh_result = runner.invoke(
+        app,
+        [
+            "refresh-watchlist",
+            "--findings",
+            str(ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"),
+            "--output",
+            str(run_path),
+        ],
+    )
+    assert refresh_result.exit_code == 0, refresh_result.output
+
+    result = runner.invoke(
+        app,
+        [
+            "extract-price-observations",
+            "--input",
+            str(run_path),
+            "--existing",
+            str(ROOT / "data" / "price_history.example.yaml"),
+            "--output",
+            str(output_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    price_history = load_price_history(output_path)
+    assert price_history.observations
+    assert len(price_history.observations) > 6
 
 
 def test_cli_monitoring_brief(tmp_path: Path) -> None:
