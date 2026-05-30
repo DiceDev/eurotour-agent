@@ -441,7 +441,11 @@ def test_cli_daily_brief_run(tmp_path: Path) -> None:
     assert (tmp_path / "price_alerts.json").exists()
     assert (tmp_path / "report.md").exists()
     assert (tmp_path / "monitoring_brief.md").exists()
+    assert (tmp_path / "summary.json").exists()
     assert "EuroTour Monitoring Brief" in (tmp_path / "monitoring_brief.md").read_text(encoding="utf-8")
+    summary = (tmp_path / "summary.json").read_text(encoding="utf-8")
+    assert '"price_alerts": 2' in summary
+    assert '"top_recommendation"' in summary
 
 
 def test_cli_refresh_accepts_trip_history(tmp_path: Path) -> None:

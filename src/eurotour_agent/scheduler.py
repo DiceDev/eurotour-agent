@@ -190,6 +190,22 @@ def daily_brief_run(
         ),
         encoding="utf-8",
     )
+    summary = {
+        "generated_at": research_run.generated_at.isoformat(),
+        "watchlist": str(watchlist),
+        "candidate_trips": len(research_run.candidate_trips),
+        "recommendations": len(recommendations),
+        "price_alerts": len(alerts),
+        "top_recommendation": recommendations[0].model_dump(mode="json") if recommendations else None,
+        "outputs": {
+            "research_run": str(output_dir / "research_run.json"),
+            "recommendations": str(output_dir / "recommendations.json"),
+            "price_alerts": str(output_dir / "price_alerts.json"),
+            "report": str(output_dir / "report.md"),
+            "monitoring_brief": str(output_dir / "monitoring_brief.md"),
+        },
+    }
+    (output_dir / "summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
     typer.echo(
         f"Wrote daily brief run to {output_dir}: "
         f"{len(recommendations)} recommendation(s), {len(alerts)} price alert(s)."

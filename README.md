@@ -110,6 +110,7 @@ For now, this chat can act as the recommendation engine while the project stores
 ## Local Outputs
 
 - `runs/latest/research_run.json`: normalized candidate trips from the latest refresh.
+- `runs/latest/summary.json`: compact machine-readable run manifest for notification layers.
 - `runs/latest/report.md`: readable recommendation report.
 - `runs/latest/monitoring_brief.md`: concise recommendation, price-alert, and destination-idea brief.
 

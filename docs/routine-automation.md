@@ -3,6 +3,7 @@
 The local automation target is `daily-brief-run`. It produces the files an automated travel check needs:
 
 - `research_run.json`
+- `summary.json`
 - `recommendations.json`
 - `price_alerts.json`
 - `report.md`
