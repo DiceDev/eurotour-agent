@@ -112,10 +112,10 @@ Source: https://www.thetrainline.com/about-us/affiliates
 ## Recommended Build Order
 
 1. Keep calendar, Spotify, and Ticketmaster stable.
-2. Add Amadeus auth and flight offer search adapters, but only write normalized `TransportOption` records.
-3. Add Amadeus flight price confirmation and use it to raise booking confidence.
-4. Add Amadeus hotel search for accommodation estimates.
-5. Add source reliability scoring to recommendation reasons.
+2. Add Amadeus auth and flight offer search adapters, but only write normalized `TransportOption` records. Done.
+3. Add Amadeus hotel offer normalization for accommodation estimates. Done.
+4. Add Amadeus flight price confirmation and use it to raise booking confidence.
+5. Add route-seed orchestration from Cheltenham airports/stations into provider searches.
 6. Add National Rail/TransportAPI only for disruption/local movement checks, not fare estimates.
 
 ## Guardrails

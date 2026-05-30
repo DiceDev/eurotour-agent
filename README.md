@@ -30,6 +30,7 @@ This project is scaffolded as API-ready but API-optional. The first version can 
 |   +-- provider-notes.md
 |   +-- provider-decision-matrix.md
 |   +-- routine-automation.md
+|   +-- overnight-research-log.md
 +-- data/
 |   +-- watchlist.example.yaml
 |   +-- trip_history.example.yaml
@@ -106,6 +107,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, validation commands, and
 See [docs/routine-automation.md](docs/routine-automation.md) for the daily brief command and Windows Task Scheduler setup.
 
 See [docs/provider-decision-matrix.md](docs/provider-decision-matrix.md) for current provider choices, source links, and integration order.
+
+See [docs/overnight-research-log.md](docs/overnight-research-log.md) for the latest long-running research/build pass notes.
 
 ## Current Cost Posture
 
