@@ -74,6 +74,7 @@ python -m eurotour_agent.scheduler price-alerts --history data\price_history.exa
 python -m eurotour_agent.scheduler extract-price-observations --input runs\latest\research_run.json --existing data\price_history.example.yaml --output local\price_history.updated.yaml
 python -m eurotour_agent.scheduler monitoring-brief --input runs\latest\research_run.json --prices data\price_history.example.yaml --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler provider-readiness --markdown
+python -m eurotour_agent.scheduler route-seeds --output local\route_seeds.yaml
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
@@ -147,3 +148,5 @@ Use `render-notification` to rebuild the sendable digest from a completed daily 
 Spotify integration is optional. Use `spotify-auth-url`, `spotify-exchange-code`, and `spotify-import-taste` after setting `SPOTIFY_CLIENT_ID` and an allowed redirect URI in `.env.local`. Token files under `data/spotify/` are ignored by git.
 
 Amadeus search is optional. Set `AMADEUS_CLIENT_ID` and `AMADEUS_CLIENT_SECRET`, then use `amadeus-flight-search` to write normalized flight `transport_options` and `amadeus-hotel-offers` to write normalized `accommodation_options`. Confirm prices with Amadeus price/availability flows or the primary airline/hotel before booking.
+
+Use `route-seeds` to generate Cheltenham-aware flight and rail search seeds from the watchlist. Bristol (`BRS`) is first, Birmingham (`BHX`) second, with London airports as fallback.

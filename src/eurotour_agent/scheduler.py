@@ -35,6 +35,7 @@ from .providers.amadeus import search_hotel_offers
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
+from .routing import route_seeds_for_watchlist
 from .spotify import (
     build_authorization_url,
     create_pkce_state,
@@ -348,6 +349,21 @@ def provider_readiness_command(
         output.parent.mkdir(parents=True, exist_ok=True)
         output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
         typer.echo(f"Wrote provider readiness for {len(payload)} provider(s) to {output}")
+        return
+    typer.echo(json.dumps(payload, indent=2))
+
+
+@app.command("route-seeds")
+def route_seeds(
+    watchlist: Path = typer.Option(Path("data/watchlist.example.yaml"), help="Watchlist YAML path."),
+    output: Path | None = typer.Option(None, help="Optional route seeds YAML output path."),
+) -> None:
+    watchlist_model = load_watchlist(watchlist)
+    seeds = route_seeds_for_watchlist(watchlist_model)
+    payload = {"route_seeds": [seed.__dict__ for seed in seeds]}
+    if output is not None:
+        write_yaml(output, payload)
+        typer.echo(f"Wrote {len(seeds)} route seed(s) to {output}")
         return
     typer.echo(json.dumps(payload, indent=2))
 

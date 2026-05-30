@@ -20,6 +20,7 @@ from eurotour_agent.providers.amadeus import _accommodation_from_hotel_offer, _t
 from eurotour_agent.providers.registry import provider_readiness_payload, source_reliability
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
 from eurotour_agent.research import build_research_run
+from eurotour_agent.routing import destination_airports, route_seeds_for_watchlist
 from eurotour_agent.scheduler import app
 from eurotour_agent.spotify import build_authorization_url, create_pkce_state
 from eurotour_agent.storage import (
@@ -73,6 +74,17 @@ def test_provider_readiness_tracks_missing_env() -> None:
     assert by_name["Ticketmaster Discovery API"]["configured"] is False
     assert "TICKETMASTER_API_KEY" in by_name["Ticketmaster Discovery API"]["missing_env"]
     assert by_name["Trainline Partner/Affiliate"]["configured"] is True
+
+
+def test_route_seeds_prioritize_cheltenham_airports() -> None:
+    watchlist = load_watchlist(ROOT / "data" / "watchlist.example.yaml")
+
+    seeds = route_seeds_for_watchlist(watchlist)
+
+    assert seeds[0].origin == "BRS"
+    assert seeds[0].destination_code == "BER"
+    assert destination_airports("Leipzig") == ("LEJ", "BER")
+    assert any(seed.mode == "rail" and seed.origin == "Cheltenham Spa" for seed in seeds)
 
 
 def test_source_reliability_scores_known_sources() -> None:
@@ -1034,6 +1046,19 @@ def test_cli_provider_readiness() -> None:
     assert result.exit_code == 0, result.output
     assert "Provider Readiness" in result.output
     assert "Amadeus Flight Offers" in result.output
+
+
+def test_cli_route_seeds(tmp_path: Path) -> None:
+    runner = CliRunner()
+    output_path = tmp_path / "routes.yaml"
+
+    result = runner.invoke(app, ["route-seeds", "--output", str(output_path)])
+
+    assert result.exit_code == 0, result.output
+    output_text = output_path.read_text(encoding="utf-8")
+    assert "BRS" in output_text
+    assert "BER" in output_text
+    assert "Cheltenham Spa" in output_text
 
 
 def test_cli_extract_price_observations(tmp_path: Path) -> None:
