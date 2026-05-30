@@ -28,6 +28,7 @@ from .monitoring import render_monitoring_brief
 from .notifications import render_notification_digest_from_files, render_notification_digest
 from .planner import rank_candidate_trips
 from .prices import append_observations, observations_from_research_run, price_alerts
+from .providers.registry import provider_readiness_payload, render_provider_readiness
 from .providers.ticketmaster import search_music_events
 from .reporting import render_markdown_report
 from .research import build_research_run
@@ -320,12 +321,32 @@ def doctor() -> None:
         ("Spotify client id", bool(settings.spotify_client_id)),
         ("Google client id", bool(settings.google_client_id)),
         ("Ticketmaster API key", bool(settings.ticketmaster_api_key)),
+        ("Amadeus client id", bool(settings.amadeus_client_id)),
+        ("TransportAPI app id", bool(settings.transportapi_app_id)),
     ]
     for label, ok in checks:
         typer.echo(f"{'OK' if ok else 'MISSING'}: {label}")
     typer.echo(f"{'OK' if Path('local').exists() else 'OPTIONAL'}: local directory")
     for label, ok in optional:
         typer.echo(f"{'CONFIGURED' if ok else 'OPTIONAL'}: {label}")
+
+
+@app.command("provider-readiness")
+def provider_readiness_command(
+    output: Path | None = typer.Option(None, help="Optional provider readiness JSON output path."),
+    markdown: bool = typer.Option(False, help="Print markdown instead of JSON."),
+) -> None:
+    settings = load_settings()
+    if markdown:
+        typer.echo(render_provider_readiness(settings))
+        return
+    payload = provider_readiness_payload(settings)
+    if output is not None:
+        output.parent.mkdir(parents=True, exist_ok=True)
+        output.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+        typer.echo(f"Wrote provider readiness for {len(payload)} provider(s) to {output}")
+        return
+    typer.echo(json.dumps(payload, indent=2))
 
 
 @app.command("validate-file")

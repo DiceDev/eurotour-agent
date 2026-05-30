@@ -7,6 +7,7 @@ from typer.testing import CliRunner
 
 from eurotour_agent.audit import audit_research_run
 from eurotour_agent.calendar import find_free_windows
+from eurotour_agent.config import Settings
 from eurotour_agent.destinations import draft_watched_trips, suggest_destinations
 from eurotour_agent.google_calendar import build_authorization_url as build_google_authorization_url
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
@@ -15,6 +16,7 @@ from eurotour_agent.models import RecommendationDecision
 from eurotour_agent.notifications import render_notification_digest
 from eurotour_agent.planner import rank_candidate_trips
 from eurotour_agent.prices import append_observations, observations_from_research_run, price_alerts
+from eurotour_agent.providers.registry import provider_readiness_payload, source_reliability
 from eurotour_agent.providers.ticketmaster import _event_from_ticketmaster
 from eurotour_agent.research import build_research_run
 from eurotour_agent.scheduler import app
@@ -61,6 +63,20 @@ def test_price_history_alerts_on_latest_drop() -> None:
     assert alerts[0].drop_percent == 20.0
     assert alerts[1].watched_trip == "Amsterdam by rail"
     assert alerts[1].is_new_low is True
+
+
+def test_provider_readiness_tracks_missing_env() -> None:
+    payload = provider_readiness_payload(Settings())
+    by_name = {item["name"]: item for item in payload}
+
+    assert by_name["Ticketmaster Discovery API"]["configured"] is False
+    assert "TICKETMASTER_API_KEY" in by_name["Ticketmaster Discovery API"]["missing_env"]
+    assert by_name["Trainline Partner/Affiliate"]["configured"] is True
+
+
+def test_source_reliability_scores_known_sources() -> None:
+    assert source_reliability("ticketmaster") > source_reliability("manual")
+    assert source_reliability("fixture") < source_reliability("manual")
 
 
 def test_research_run_extracts_price_observations() -> None:
@@ -368,6 +384,7 @@ def test_monitoring_brief_combines_recommendations_prices_and_destinations() -> 
     brief = render_monitoring_brief(research_run, trip_history=trip_history, price_history=price_history)
 
     assert "## Top Recommendations" in brief
+    assert "## Source Quality" in brief
     assert "## Price Alerts" in brief
     assert "Berlin long weekend" in brief
     assert "Leipzig" in brief
@@ -909,6 +926,16 @@ def test_cli_price_alerts(tmp_path: Path) -> None:
     output_text = output_path.read_text(encoding="utf-8")
     assert "Berlin long weekend" in output_text
     assert "drop_percent" in output_text
+
+
+def test_cli_provider_readiness() -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(app, ["provider-readiness", "--markdown"])
+
+    assert result.exit_code == 0, result.output
+    assert "Provider Readiness" in result.output
+    assert "Amadeus Flight Offers" in result.output
 
 
 def test_cli_extract_price_observations(tmp_path: Path) -> None:

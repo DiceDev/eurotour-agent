@@ -17,6 +17,10 @@ class Settings(BaseSettings):
     spotify_client_id: str | None = Field(default=None, alias="SPOTIFY_CLIENT_ID")
     spotify_redirect_uri: str = Field(default="http://localhost:8765/callback", alias="SPOTIFY_REDIRECT_URI")
     ticketmaster_api_key: str | None = Field(default=None, alias="TICKETMASTER_API_KEY")
+    amadeus_client_id: str | None = Field(default=None, alias="AMADEUS_CLIENT_ID")
+    amadeus_client_secret: str | None = Field(default=None, alias="AMADEUS_CLIENT_SECRET")
+    transportapi_app_id: str | None = Field(default=None, alias="TRANSPORTAPI_APP_ID")
+    transportapi_app_key: str | None = Field(default=None, alias="TRANSPORTAPI_APP_KEY")
 
 
 def load_settings() -> Settings:

@@ -4,6 +4,7 @@ from .destinations import suggest_destinations
 from .models import PriceHistory, RecommendationDecision, ResearchRun, TripHistory
 from .planner import rank_candidate_trips
 from .prices import price_alerts
+from .providers.registry import source_reliability
 
 
 def render_monitoring_brief(
@@ -45,6 +46,15 @@ def render_monitoring_brief(
         lines.append("- No candidate trips found.")
     lines.append("")
 
+    lines.extend(["## Source Quality", ""])
+    quality = _source_quality(research_run)
+    if quality:
+        for source, score in quality:
+            lines.append(f"- {source}: reliability {score:.2f}")
+    else:
+        lines.append("- No priced or event sources found.")
+    lines.append("")
+
     lines.extend(["## Price Alerts", ""])
     if alerts:
         for alert in alerts:
@@ -79,3 +89,13 @@ def render_monitoring_brief(
         lines.append("- Add watchlist, history, or price data; the agent has nothing useful to chew on.")
     lines.append("")
     return "\n".join(lines)
+
+
+def _source_quality(research_run: ResearchRun) -> list[tuple[str, float]]:
+    sources: set[str] = set()
+    for trip in research_run.candidate_trips:
+        sources.update(option.source for option in trip.transport_options)
+        sources.update(option.source for option in trip.accommodation_options)
+        sources.update(event.source for event in trip.event_options)
+        sources.update(component.source for component in trip.cost_components)
+    return sorted(((source, source_reliability(source)) for source in sources), key=lambda item: item[1], reverse=True)

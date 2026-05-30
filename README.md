@@ -28,6 +28,7 @@ This project is scaffolded as API-ready but API-optional. The first version can 
 |   +-- concert-discovery-playbook.md
 |   +-- chat-operated-workflow.md
 |   +-- provider-notes.md
+|   +-- provider-decision-matrix.md
 |   +-- routine-automation.md
 +-- data/
 |   +-- watchlist.example.yaml
@@ -72,6 +73,7 @@ python -m eurotour_agent.scheduler audit-run
 python -m eurotour_agent.scheduler price-alerts --history data\price_history.example.yaml
 python -m eurotour_agent.scheduler extract-price-observations --input runs\latest\research_run.json --existing data\price_history.example.yaml --output local\price_history.updated.yaml
 python -m eurotour_agent.scheduler monitoring-brief --input runs\latest\research_run.json --prices data\price_history.example.yaml --history data\trip_history.example.yaml
+python -m eurotour_agent.scheduler provider-readiness --markdown
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
@@ -99,6 +101,8 @@ No secrets are required for the dry-run scaffold.
 See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, validation commands, and the rules for keeping real tokens and personal data out of git.
 
 See [docs/routine-automation.md](docs/routine-automation.md) for the daily brief command and Windows Task Scheduler setup.
+
+See [docs/provider-decision-matrix.md](docs/provider-decision-matrix.md) for current provider choices, source links, and integration order.
 
 ## Current Cost Posture
 
