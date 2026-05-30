@@ -84,6 +84,10 @@ Copy `.env.example` to `.env.local` when you are ready to connect providers.
 
 No secrets are required for the dry-run scaffold.
 
+## Development
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, validation commands, and the rules for keeping real tokens and personal data out of git.
+
 ## Current Cost Posture
 
 Start with the local scheduler and free-tier/provider-approved APIs where possible. Add OpenAI API recommendations only after the search and itinerary data model is stable. See [docs/cost-estimates.md](docs/cost-estimates.md).
