@@ -10,6 +10,7 @@ from eurotour_agent.calendar import find_free_windows
 from eurotour_agent.destinations import draft_watched_trips, suggest_destinations
 from eurotour_agent.google_calendar import build_authorization_url as build_google_authorization_url
 from eurotour_agent.google_calendar import create_pkce_state as create_google_pkce_state
+from eurotour_agent.monitoring import render_monitoring_brief
 from eurotour_agent.models import RecommendationDecision
 from eurotour_agent.planner import rank_candidate_trips
 from eurotour_agent.prices import price_alerts
@@ -330,6 +331,30 @@ def test_report_includes_run_summary() -> None:
 
     assert "## Run Summary" in report
     assert "Candidate trips: 2" in report
+
+
+def test_monitoring_brief_combines_recommendations_prices_and_destinations() -> None:
+    watchlist_path = ROOT / "data" / "watchlist.example.yaml"
+    findings_path = ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"
+    history_path = ROOT / "data" / "trip_history.example.yaml"
+    prices_path = ROOT / "data" / "price_history.example.yaml"
+    watchlist = load_watchlist(watchlist_path)
+    findings = load_manual_findings(findings_path)
+    trip_history = load_trip_history(history_path)
+    price_history = load_price_history(prices_path)
+    research_run = build_research_run(
+        watchlist,
+        watchlist_path=str(watchlist_path),
+        manual_findings=findings,
+        trip_history=trip_history,
+    )
+
+    brief = render_monitoring_brief(research_run, trip_history=trip_history, price_history=price_history)
+
+    assert "## Top Recommendations" in brief
+    assert "## Price Alerts" in brief
+    assert "Berlin long weekend" in brief
+    assert "Leipzig" in brief
 
 
 def test_audit_research_run_flags_incomplete_data() -> None:
@@ -767,6 +792,43 @@ def test_cli_price_alerts(tmp_path: Path) -> None:
     output_text = output_path.read_text(encoding="utf-8")
     assert "Berlin long weekend" in output_text
     assert "drop_percent" in output_text
+
+
+def test_cli_monitoring_brief(tmp_path: Path) -> None:
+    runner = CliRunner()
+    run_path = tmp_path / "run.json"
+    brief_path = tmp_path / "monitoring.md"
+    refresh_result = runner.invoke(
+        app,
+        [
+            "refresh-watchlist",
+            "--findings",
+            str(ROOT / "data" / "manual_findings.sample-2026-05-30.yaml"),
+            "--history",
+            str(ROOT / "data" / "trip_history.example.yaml"),
+            "--output",
+            str(run_path),
+        ],
+    )
+    assert refresh_result.exit_code == 0, refresh_result.output
+
+    result = runner.invoke(
+        app,
+        [
+            "monitoring-brief",
+            "--input",
+            str(run_path),
+            "--prices",
+            str(ROOT / "data" / "price_history.example.yaml"),
+            "--output",
+            str(brief_path),
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    output_text = brief_path.read_text(encoding="utf-8")
+    assert "EuroTour Monitoring Brief" in output_text
+    assert "Price Alerts" in output_text
 
 
 def test_cli_audit_run_flags_sample(tmp_path: Path) -> None:

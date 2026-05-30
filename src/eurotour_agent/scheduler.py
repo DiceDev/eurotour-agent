@@ -24,6 +24,7 @@ from .google_calendar import (
 )
 from .history import summarize_history
 from .models import ManualFindings, ManualTripFindings
+from .monitoring import render_monitoring_brief
 from .planner import rank_candidate_trips
 from .prices import price_alerts
 from .providers.ticketmaster import search_music_events
@@ -272,6 +273,32 @@ def price_alerts_command(
         typer.echo(f"Wrote {len(alerts)} price alert(s) to {output}")
         return
     typer.echo(json.dumps(payload, indent=2))
+
+
+@app.command("monitoring-brief")
+def monitoring_brief(
+    input_path: Path = typer.Option(Path("runs/latest/research_run.json"), "--input", help="Research run JSON input."),
+    output: Path = typer.Option(Path("runs/latest/monitoring_brief.md"), help="Markdown monitoring brief output path."),
+    history: Path | None = typer.Option(None, help="Optional prior trip history YAML path."),
+    prices: Path | None = typer.Option(None, help="Optional price history YAML path."),
+    destination_limit: int = typer.Option(5, help="Destination ideas to include."),
+    drop_threshold_percent: float = typer.Option(10.0, help="Price drop alert threshold."),
+) -> None:
+    research_run = load_research_run(input_path)
+    trip_history = load_trip_history(history) if history else None
+    price_history = load_price_history(prices) if prices else None
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(
+        render_monitoring_brief(
+            research_run=research_run,
+            trip_history=trip_history,
+            price_history=price_history,
+            destination_limit=destination_limit,
+            drop_threshold_percent=drop_threshold_percent,
+        ),
+        encoding="utf-8",
+    )
+    typer.echo(f"Wrote monitoring brief to {output}")
 
 
 @app.command("history-summary")

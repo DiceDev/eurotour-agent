@@ -66,6 +66,7 @@ python -m eurotour_agent.scheduler rank
 python -m eurotour_agent.scheduler report
 python -m eurotour_agent.scheduler audit-run
 python -m eurotour_agent.scheduler price-alerts --history data\price_history.example.yaml
+python -m eurotour_agent.scheduler monitoring-brief --input runs\latest\research_run.json --prices data\price_history.example.yaml --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler doctor
 python -m eurotour_agent.scheduler history-summary --history data\trip_history.example.yaml
 python -m eurotour_agent.scheduler suggest-destinations --history data\trip_history.example.yaml --limit 5
@@ -104,6 +105,7 @@ For now, this chat can act as the recommendation engine while the project stores
 
 - `runs/latest/research_run.json`: normalized candidate trips from the latest refresh.
 - `runs/latest/report.md`: readable recommendation report.
+- `runs/latest/monitoring_brief.md`: concise recommendation, price-alert, and destination-idea brief.
 
 Dry-run refreshes use deterministic fixture data. Treat every fare and ticket as provisional until checked against a primary source.
 
